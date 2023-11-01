@@ -1,0 +1,33 @@
+/* Add some styling to the captcha question */
+.text-captcha {
+    background-color: #f0f0f0;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Style the text input field for the captcha answer */
+.text-captcha input[type="text"] {
+    width: 100px;
+    padding: 5px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Add a little extra styling to the login button */
+#wp-submit {
+    background-color: #0073e6;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Change the color of error messages for the captcha */
+#login_error {
+    color: #ff0000;
+}
