@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: Text Captcha Login
+Plugin Name: Math Captcha Login
 Description: Add a text captcha to the login page.
-Version: 0.0.2
+Version: 0.0.3
 Author: Jay Wright
 */
 
@@ -74,7 +74,12 @@ function text_captcha_login_validation($user) {
         }
 
         if ($entered_result !== $expected_result) {
+            // Add 'incorrect' class to the captcha field for incorrect answer
+            echo '<script>document.querySelector(".text-captcha input[type=text]").classList.add("incorrect");</script>';
             return new WP_Error('authentication_failed', __('<strong>ERROR</strong>: Incorrect captcha.'));
+        } else {
+            // Add 'correct' class to the captcha field for correct answer
+            echo '<script>document.querySelector(".text-captcha input[type=text]").classList.add("correct");</script>';
         }
     }
 
