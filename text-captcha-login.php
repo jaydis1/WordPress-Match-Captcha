@@ -13,16 +13,31 @@ function text_captcha_login_enqueue_scripts() {
 add_action('login_enqueue_scripts', 'text_captcha_login_enqueue_scripts');
 
 function text_captcha_login_display() {
-    $num1 = rand(1, 10);
-    $num2 = rand(1, 10);
+    $num1 = rand(1, 100); // Increase the range of numbers
+    $num2 = rand(1, 100);
 
-    // Generate a random number (0 or 1) to determine the operation.
-    $operation = (rand(0, 1) === 0) ? '*' : '/';
+    // Generate a random number (0 to 3) to determine the operation.
+    $operation = rand(0, 3);
+    switch ($operation) {
+        case 0:
+            $symbol = '+';
+            $expected_result = $num1 + $num2;
+            break;
+        case 1:
+            $symbol = '-';
+            $expected_result = $num1 - $num2;
+            break;
+        case 2:
+            $symbol = '*';
+            $expected_result = $num1 * $num2;
+            break;
+        case 3:
+            $symbol = '/';
+            $expected_result = $num1 / $num2;
+            break;
+    }
 
-    // Calculate the expected result based on the operation.
-    $expected_result = ($operation === '*') ? $num1 * $num2 : $num1 / $num2;
-
-    echo '<p>Please solve this math question: ' . $num1 . ' ' . $operation . ' ' . $num2 . ' = <input type="text" name="text_captcha_result" /></p>';
+    echo '<p>Please solve this math question: ' . $num1 . ' ' . $symbol . ' ' . $num2 . ' = <input type="text" name="text_captcha_result" /></p>';
 }
 
 add_action('login_form', 'text_captcha_login_display');
@@ -30,20 +45,32 @@ add_action('login_form', 'text_captcha_login_display');
 function text_captcha_login_validation($user) {
     if (isset($_POST['text_captcha_result'])) {
         $entered_result = intval($_POST['text_captcha_result']);
-        $operation = (rand(0, 1) === 0) ? '*' : '/';
 
-        if ($operation === '*') {
-            $num1 = intval($_POST['log']);
-            $num2 = intval($_POST['pwd']);
-            $expected_result = $num1 * $num2;
-        } else {
-            // For division, make sure $num2 is not 0 to avoid division by zero.
-            $num1 = intval($_POST['log']);
-            $num2 = intval($_POST['pwd']);
-            if ($num2 === 0) {
-                return new WP_Error('authentication_failed', __('<strong>ERROR</strong>: Incorrect captcha.'));
-            }
-            $expected_result = $num1 / $num2;
+        // Retrieve the operation symbol from the hidden field.
+        $operation = sanitize_text_field($_POST['text_captcha_operation']);
+
+        // Retrieve the operands based on the operation.
+        $num1 = intval($_POST['log']);
+        $num2 = intval($_POST['pwd']);
+
+        // Calculate the expected result based on the operation.
+        switch ($operation) {
+            case '+':
+                $expected_result = $num1 + $num2;
+                break;
+            case '-':
+                $expected_result = $num1 - $num2;
+                break;
+            case '*':
+                $expected_result = $num1 * $num2;
+                break;
+            case '/':
+                // For division, make sure $num2 is not 0 to avoid division by zero.
+                if ($num2 === 0) {
+                    return new WP_Error('authentication_failed', __('<strong>ERROR</strong>: Incorrect captcha.'));
+                }
+                $expected_result = $num1 / $num2;
+                break;
         }
 
         if ($entered_result !== $expected_result) {
